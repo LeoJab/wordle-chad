@@ -1,0 +1,10 @@
+{
+  "title": "Mot du jour",
+  "description": "Un mot français de 5 lettres à deviner chaque jour (nouveau mot à 3 h). 1 point par jour réussi !",
+  "author": "ChadGang",
+  "category": "Solo",
+  "emoji": "🔤",
+  "image": "cover.png",
+  "classement": "victoires",
+  "quotidien": true
+}

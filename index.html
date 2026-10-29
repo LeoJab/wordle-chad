@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Mot du jour</title>
+<script src="/_sdk.js"></script>
+<style>
+:root{--ink:#12102b;--sun:#ffd426;--blue:#2433f2;--pink:#ff4f6d;--mint:#2ee6a6;--sky:#5cc8ff;--paper:#fffdf5}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:linear-gradient(170deg,#3a49ff,#2433f2 55%,#1b1f6b);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#fff;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+.hide{display:none!important}
+header{text-align:center;padding:max(8px,env(safe-area-inset-top)) 56px 4px;width:100%}
+h1{font-size:clamp(26px,6vh,40px);font-weight:900;font-style:italic;line-height:1;color:var(--sun);-webkit-text-stroke:3px var(--ink);paint-order:stroke fill;text-shadow:0 4px 0 var(--ink)}
+.sub{font-weight:800;font-size:13px;margin-top:6px}.sub span{background:#12102bcc;border-radius:99px;padding:3px 12px;display:inline-block}
+.btn{font:inherit;font-weight:900;border:3px solid var(--ink);border-radius:14px;padding:8px 14px;background:#fff;color:var(--ink);box-shadow:3px 3px 0 var(--ink);cursor:pointer}
+.btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.btn.primary{background:var(--sun)}
+#toast{position:fixed;left:50%;top:max(70px,12%);transform:translateX(-50%);background:var(--ink);color:#fff;font-weight:900;border-radius:12px;padding:9px 16px;z-index:30;pointer-events:none;opacity:0;transition:opacity .2s;white-space:nowrap}
+#toast.on{opacity:1}
+.veil{position:fixed;inset:0;background:#12102b99;display:grid;place-items:center;z-index:20;padding:14px}
+.panel{width:min(420px,100%);max-height:calc(100dvh - 28px);overflow:auto;background:var(--paper);color:var(--ink);border:4px solid var(--ink);border-radius:22px;padding:18px;box-shadow:0 8px 0 var(--ink);text-align:center}
+.panel h2{font-size:28px;font-weight:900;margin-bottom:4px}
+.panel .big{font-size:56px;line-height:1.1}
+.muted{color:#5d5b80;font-weight:700;font-size:14px}
+.pt{display:inline-block;background:var(--pink);color:#fff;font-weight:900;border:3px solid var(--ink);border-radius:99px;padding:4px 14px;margin:8px 0}
+.lb{text-align:left;margin:12px 0 4px;display:grid;gap:4px}
+.lb h4{font-size:13px;color:#5d5b80}
+.lb div{display:flex;gap:8px;align-items:center;padding:5px 10px;border-radius:12px;background:#f1efff;font-weight:800;font-size:14px}
+.lb div.you{background:#fff1b8;border:2px solid var(--ink)}
+.lb div span:nth-child(2){flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px}
+
+body{display:flex;flex-direction:column;align-items:center}
+#grid{display:grid;grid-template-rows:repeat(6,1fr);gap:6px;margin:10px 0 8px;flex:0 1 auto;width:min(340px,calc((100dvh - 330px)*5/6),92vw);aspect-ratio:5/6}
+.r{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.t{display:grid;place-items:center;border:3px solid #ffffff55;border-radius:10px;background:#ffffff1a;font-weight:900;font-size:clamp(20px,5.2vh,34px);color:#fff;text-transform:uppercase}
+.t.f{border-color:#fff;animation:pop .12s}
+.t.rev{border-color:var(--ink);color:#fff;animation:flip .6s ease both;animation-delay:calc(var(--i)*.28s)}
+.t.s0{--c:#4a4f86}.t.s1{--c:#e0a800}.t.s2{--c:#16b87f}
+@keyframes flip{0%{transform:rotateX(0);background:#ffffff1a}49%{transform:rotateX(90deg);background:#ffffff1a}50%{background:var(--c)}100%{transform:rotateX(0);background:var(--c)}}
+@keyframes pop{50%{transform:scale(1.12)}}
+.r.shake{animation:shake .4s}
+@keyframes shake{20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
+.t.win{animation:hop .5s ease both;animation-delay:calc(var(--i)*.09s)}
+@keyframes hop{40%{transform:translateY(-14px)}}
+#kb{width:min(500px,100vw);padding:0 4px max(10px,env(safe-area-inset-bottom));margin-top:auto;display:grid;gap:6px}
+.kr{display:flex;gap:5px;justify-content:center}
+.k{flex:1;max-width:44px;height:clamp(44px,7.4vh,58px);border:0;border-radius:8px;background:#e8e9ff;color:var(--ink);font:inherit;font-weight:900;font-size:clamp(14px,2.2vh,18px);cursor:pointer;box-shadow:0 3px 0 #12102b66;padding:0}
+.k:active{transform:translateY(2px);box-shadow:0 1px 0 #12102b66}
+.k.w{max-width:64px;flex:1.5;font-size:15px}
+.k.s0{background:#4a4f86;color:#fff}.k.s1{background:#e0a800}.k.s2{background:#16b87f;color:#fff}
+#top{position:absolute;right:10px;top:max(10px,env(safe-area-inset-top));display:flex;gap:6px}
+#top .btn{padding:2px 9px;font-size:16px;line-height:1.3;color:var(--ink)}
+.rules{text-align:left;font-size:14px;line-height:1.5;font-weight:600;margin:8px 0}
+.rules .ex{display:flex;gap:4px;margin:6px 0}.rules .ex i{font-style:normal;width:30px;height:30px;display:grid;place-items:center;border-radius:6px;font-weight:900;color:#fff;background:#4a4f86}
+.word{font-size:34px;font-weight:900;letter-spacing:4px;margin:4px 0}
+</style>
+</head>
+<body>
+<header><h1>MOT DU JOUR</h1><div class="sub"><span id="info"></span></div></header>
+<div id="top"><button class="btn" id="bRules" title="Règles">?</button></div>
+<div id="grid"></div>
+<div id="kb"></div>
+<div id="toast"></div>
+<div class="veil hide" id="veil"><div class="panel" id="panel"></div></div>
+<script>
+const $=id=>document.getElementById(id);
+/* Journée du jeu : change chaque jour à 3h du matin (heure de Paris), même calcul que le hub */
+const DAY=(()=>{const f=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Paris',hourCycle:'h23',year:'numeric',month:'numeric',day:'numeric',hour:'numeric',minute:'numeric',second:'numeric'});
+  return ()=>{const o={};for(const p of f.formatToParts(Date.now()))o[p.type]=+p.value;const wall=Date.UTC(o.year,o.month-1,o.day,o.hour,o.minute,o.second)-3*36e5,n=Math.floor(wall/864e5);return{n,id:new Date(n*864e5).toISOString().slice(0,10),left:(n+1)*864e5-wall}}})();
+const fmtLeft=ms=>{const s=Math.max(0,Math.floor(ms/1000)),h=Math.floor(s/3600),m=Math.floor(s%3600/60);return h+' h '+String(m).padStart(2,'0')+' min'};
+const ls=(k,v)=>{try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v)}catch{return null}};
+const HUB=typeof ChadGang!=='undefined'&&typeof ChadGang.finPartie==='function';
+const startedDay=DAY().id;
+setInterval(()=>{if(DAY().id!==startedDay)location.reload()},20000); // nouvelle journée : on recharge
+let toastT=0;function toast(t,ms){const e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>e.classList.remove('on'),ms||1400)}
+/* réussite du jour -> hub (1 point par jour, le hub vérifie aussi) */
+function sendWin(st,key,cb){if(!HUB||st.sent)return;ChadGang.finPartie({gagne:true,partie:'jour-'+st.day}).then(r=>{st.sent=1;ls(key,JSON.stringify(st));cb&&cb(r)}).catch(()=>{})}
+/* classement du hub (points) */
+function drawBoard(el){el.replaceChildren();if(!HUB||typeof ChadGang.classement!=='function')return;
+  ChadGang.classement().then(d=>{if(!d||!d.rows||!d.rows.length)return;el.replaceChildren();const h=document.createElement('h4');h.textContent='🏆 Classement du hub (1 point par jour réussi)';el.append(h);
+    const line=(rk,name,val,you)=>{const x=document.createElement('div');if(you)x.className='you';[rk,name,val].forEach(t=>{const s=document.createElement('span');s.textContent=t;x.append(s)});el.append(x)};
+    d.rows.slice(0,5).forEach((r,i)=>line(['🥇','🥈','🥉'][i]||(i+1)+'.',r.name+(r.you?' (toi)':''),r.wins+' pt'+(r.wins>1?'s':''),r.you));
+    if(d.me&&d.me.rank>5)line(d.me.rank+'.','Toi',d.me.wins+' pt'+(d.me.wins>1?'s':''),true)}).catch(()=>{})}
+
+const WORDS=JSON.parse(decodeURIComponent(escape(atob('WyJCSUxMRSIsICJUQUxPTiIsICJDQURSRSIsICJSSUNIRSIsICJQScOIQ0UiLCAiT1VUSUwiLCAiVFJBTUUiLCAiRk9VRVQiLCAiQkFHVUUiLCAiVklMTEUiLCAiTU9VTEUiLCAiRU1BSUwiLCAiTU9OREUiLCAiRklMT04iLCAiUlVJTkUiLCAiUE9JUkUiLCAiRlJJVEUiLCAiRlJBSVMiLCAiQU1PVVIiLCAiT05DTEUiLCAiUFJJU0UiLCAiQkFMTEUiLCAiQ09DT04iLCAiU09OREUiLCAiTVVTw4lFIiwgIlNVSkVUIiwgIk9SRFJFIiwgIsOJVklFUiIsICJQTEFJRSIsICJMVVRURSIsICJCT1VMRSIsICJTQVVHRSIsICJCQVJCRSIsICJCT0NBTCIsICJMQU1QRSIsICJVVElMRSIsICJPUMOJUkEiLCAiQVJNw4lFIiwgIsOJVEFHRSIsICJBVE9NRSIsICJESU5ERSIsICJSRVZVRSIsICJBTcOIUkUiLCAiREVOU0UiLCAiUEVSTEUiLCAiSk9VRVQiLCAiT1VBVEUiLCAiUE9VTEUiLCAiUsOJQ0lUIiwgIkNBU1NFIiwgIsOJUE9VWCIsICJTRUxMRSIsICJORUlHRSIsICJBSU1FUiIsICJFTkNSRSIsICJBUFBFTCIsICJURU1QUyIsICJCTEFOQyIsICJQQU5ORSIsICJIT01NRSIsICJDQVJSw4kiLCAiVFJBSVQiLCAiQklCTEUiLCAiVEjDiE1FIiwgIkdBTE9QIiwgIlRPVEFMIiwgIkZFTU1FIiwgIkNPUElFIiwgIkjDlFRFTCIsICJKRVVESSIsICJHUkFWRSIsICJDTEFJUiIsICJDUklNRSIsICJCUkFWRSIsICJCT1NTRSIsICLDiVBBSVMiLCAiTUFVVkUiLCAiQUxMScOJIiwgIkNBTkFMIiwgIlJPVVRFIiwgIkNIQU9TIiwgIk1BTUlFIiwgIkRBTlNFIiwgIlJPTkRFIiwgIk5VQUdFIiwgIlNJUk9QIiwgIlBBVElOIiwgIkNPUlBTIiwgIlRPTk5FIiwgIkxJQlJFIiwgIlNPVUNJIiwgIlBBTE1FIiwgIkZJTExFIiwgIkFSUsOKVCIsICJNT1lFTiIsICJDUk9JWCIsICJWSVZSRSIsICJURVhURSIsICJET1VDRSIsICLDiVRBUEUiLCAiw4lDT0xFIiwgIkZJQ0hFIiwgIkZSVUlUIiwgIkJPUk5FIiwgIkNIQU5UIiwgIkNIQUlSIiwgIk5BVkVUIiwgIkRSw5RMRSIsICJTQ09SRSIsICJNQUlSRSIsICJWQU5ORSIsICJHRVNURSIsICJGT1VMRSIsICJWRU5JTiIsICJMSVRSRSIsICJTT1VURSIsICJMT1lFUiIsICJIQUxURSIsICJTScOIR0UiLCAiUExBR0UiLCAiTUFSSU4iLCAiVkFHVUUiLCAiR0xBQ0UiLCAiR0lWUkUiLCAiREFMTEUiLCAiTkVWRVUiLCAiQkFMQUkiLCAiUExVTUUiLCAiQVDDiVJPIiwgIkhVSUxFIiwgIlRPTUJFIiwgIkpPVUVSIiwgIlNPUlRFIiwgIkJBQ09OIiwgIkTDjk5FUiIsICJIT05URSIsICJGVUlURSIsICJNT0lORSIsICJOT0JMRSIsICJCSUNIRSIsICJUScOIREUiLCAiVkVSUkUiLCAiUE9NUEUiLCAiQU1BTlQiLCAiRVhUUkEiLCAiQ1LDgk5FIiwgIkVTU09SIiwgIkdJTEVUIiwgIk9OR0xFIiwgIkJMT05EIiwgIktPQUxBIiwgIkRVUsOJRSIsICJIQVJQRSIsICJDUsOITUUiLCAiQ0lCTEUiLCAiVkVVVkUiLCAiVklFVVgiLCAiUEhBUkUiLCAiQ0FOTkUiLCAiVkVTVEUiLCAiSEFNQUMiLCAiSElCT1UiLCAiVEFTU0UiLCAiQ0FDQU8iLCAiQkFaQVIiLCAiRU5OVUkiLCAiQlVMTEUiLCAiRFJBTUUiLCAiT01CUkUiLCAiQ1lDTEUiLCAiVklUUkUiLCAiT1JHVUUiLCAiSMOJUk9TIiwgIlNBQk9UIiwgIkdSw4hWRSIsICJUUklCVSIsICJCT1RURSIsICJUUkFJTiIsICJQQUlSRSIsICJQVVLDiUUiLCAiSEVSQkUiLCAiw4lHT1VUIiwgIlBJQU5PIiwgIkdPUkdFIiwgIlBMRUlOIiwgIlFVRVVFIiwgIlRFUk1FIiwgIlNUT1JFIiwgIkhBQklUIiwgIlBST01PIiwgIlBBVFRFIiwgIklNQUdFIiwgIlJIVU1FIiwgIlNFTUVSIiwgIkZST0lEIiwgIkdVw4pQRSIsICJFU1NBSSIsICJTQUxPTiIsICJIRVVSRSIsICJNw4lUQUwiLCAiVEFCQUMiLCAiQ0hBVUQiLCAiQ1LDilBFIiwgIkFOQ1JFIiwgIkZPUkNFIiwgIkJBTkpPIiwgIkFOVFJFIiwgIlBSSU1FIiwgIlBPU0VSIiwgIlNFVUlMIiwgIkZMQUlSIiwgIldBR09OIiwgIkxPVVJEIiwgIlNPVVBFIiwgIkFUT1VUIiwgIkNPVVJUIiwgIlBFTlRFIiwgIk1BTElOIiwgIk9Dw4lBTiIsICJSQVlPTiIsICJUQUJMRSIsICJQTE9NQiIsICJTVFlMTyIsICJTQVVMRSIsICJGSU5BTCIsICJBVlJJTCIsICJGQVVURSIsICJQQVVTRSIsICJEw4lDT1IiLCAiQk9OVMOJIiwgIkNIVVRFIiwgIkFNQlJFIiwgIlJPQ0hFIiwgIkNPTlRFIiwgIlNJR05FIiwgIkZVU8OJRSIsICJKQVVORSIsICJHRU5SRSIsICJQRVJURSIsICJNSU5DRSIsICJBSURFUiIsICJBTk7DiUUiLCAiR1JBSU4iLCAiU1VQRVIiLCAiTUVSTEUiLCAiVEVOVEUiLCAiVFVZQVUiLCAiQklMQU4iLCAiQUNJRVIiLCAiTcOIQ0hFIiwgIlNPVURFIiwgIlVOSVTDiSIsICJNQVNTRSIsICJBTkdMRSIsICJSRUlORSIsICLDiUzDiFZFIiwgIkFWSU9OIiwgIlNFSVpFIiwgIlRFTklSIiwgIkJSVU1FIiwgIkNISUVOIiwgIkNIT1NFIiwgIlBMQUNFIiwgIklOREVYIiwgIkNMT05FIiwgIkVOVklFIiwgIlBJTkNFIiwgIkNPTVRFIiwgIk5BR0VSIiwgIlRFUlJFIiwgIkFTVFJFIiwgIlDDikNIRSIsICJGRVJNRSIsICJDQVVTRSIsICLDiUNSQU4iLCAiU1RBREUiLCAiQVVESU8iLCAiQkVMTEUiLCAiVkFDSEUiLCAiQ1JJU0UiLCAiT0RFVVIiLCAiR09NTUUiLCAiQk9YRVIiLCAiTElHTkUiLCAiQ0hBTVAiLCAiREVVSUwiLCAiw4lUVURFIiwgIlNVSVRFIiwgIkNSQUJFIiwgIkJBU1NFIiwgIkxPR0VSIiwgIlJPQk9UIiwgIlVTQUdFIiwgIkRST0lUIiwgIkZMRVVSIiwgIkZPUk1FIiwgIkJBUlJFIiwgIlRJVFJFIiwgIlJBTVBFIiwgIlBBWUVSIiwgIlVTSU5FIiwgIk9CSkVUIiwgIlLDiEdMRSIsICJNRVNTRSIsICJBSUdMRSIsICJBR0VOVCIsICJHQVJERSIsICJCUklTRSIsICJGQVJDRSIsICJPRkZSRSIsICLDiVBJQ0UiLCAiSE9SREUiLCAiQ0FMTUUiLCAiQ09MT04iLCAiVElHUkUiLCAiQkFOQUwiLCAiTElTVEUiLCAiU0NFQVUiLCAiU0lOR0UiLCAiU09VUkQiLCAiWsOIQlJFIiwgIlBSSUVSIiwgIlRFSU5UIiwgIlBIQVNFIiwgIlNLSUVSIiwgIlRSw5RORSIsICJBTEJVTSIsICJUT0FTVCIsICJDT0JSQSIsICJQT0lOVCIsICJCQU5ERSIsICJHRU5PVSIsICJHVUlERSIsICJPVUVTVCIsICJBUkJSRSIsICJGUkFOQyIsICJNRVJDSSIsICJET0lHVCIsICJCVVRJTiIsICJPUkFHRSIsICJIWU1ORSIsICJOQVBQRSIsICJERVRURSIsICJNQU5JRSIsICJUUkFDRSIsICJWT0xFVCIsICJDQVJURSIsICJGUsOIUkUiLCAiRlVNw4lFIiwgIlNBVk9OIiwgIlRJUkVSIiwgIlBJU1RFIiwgIkNVSVJFIiwgIkpVU1RFIiwgIlJPVUdFIiwgIkFKT1VUIiwgIlNPRVVSIiwgIkZFTlRFIiwgIk1PUlVFIiwgIkxBUk1FIiwgIlNBVUNFIiwgIlVOSU9OIiwgIkVGRkVUIiwgIlNDw4hORSIsICJQRUxMRSIsICJMQUlORSIsICJMWUPDiUUiLCAiTEVWRVIiLCAiRMOJTEFJIiwgIkZPUsOKVCIsICJHUklMTCIsICJCScOIUkUiLCAiTk9FVUQiLCAiU0FMVVQiLCAiR1JBTkQiLCAiU1VDUkUiLCAiQ0hPSVgiLCAiU09NTUUiLCAiVE9JTEUiLCAiUE9VQ0UiLCAiVFJJRVIiLCAiTEFOQ0UiLCAiQlJVVEUiLCAiRlJFSU4iLCAiTFVOREkiLCAiVEFSVEUiLCAiUE9ORVkiLCAiRkFJUkUiLCAiUE9NTUUiLCAiUE9SVEUiLCAiUEVTRVIiLCAiTVVMRVQiLCAiQVJDSEUiLCAiVEFQSVMiLCAiUEVUSVQiLCAiTUFUSU4iLCAiQUxJQkkiLCAiU1RBR0UiLCAiVklHTkUiLCAiSE9VTEUiLCAiTUFHSUUiLCAiUExVSUUiLCAiTEXDh09OIiwgIlBIT1RPIiwgIsOJQ0hFQyIsICJOT1VFUiIsICJDQUJBUyIsICJCVVNURSIsICJKQU1CRSIsICJGQVVWRSIsICJNQVRDSCIsICJQVUlUUyIsICJDUlVFTCIsICJCT01CRSIsICJGSU5JUiIsICJDT0xMRSIsICJCT0lSRSIsICJCUlVJVCIsICJNT1JBTCIsICJNw4lUUk8iLCAiQ09SREUiLCAiQ09VREUiLCAiSElWRVIiLCAiTEFQSU4iLCAiQ09RVUUiLCAiRVhBQ1QiLCAiw4lUQU5HIiwgIkZPSVJFIiwgIkJJRE9OIiwgIkRPVVRFIiwgIlRBQ0hFIiwgIkJPTk5FIiwgIlBFSU5FIiwgIkdMT0JFIiwgIkTDiUJBVCIsICJCw4lUT04iLCAiTUlYVEUiLCAiREVHUsOJIiwgIlFVQVJUIiwgIkpFVU5FIiwgIkNBUkdPIiwgIkTDiVDDlFQiLCAiU0FMTEUiLCAiRU5GRVIiLCAiVEFVUEUiLCAiQklKT1UiLCAiSk9JTlQiLCAiU0FCTEUiLCAiTElWUkUiLCAiUlVDSEUiLCAiU0VSUkUiLCAiQ0xPV04iLCAiRkFCTEUiLCAiTE9DQUwiLCAiR0VMRVIiLCAiUE9TVEUiLCAiREFHVUUiLCAiTEFSR0UiLCAiTklDSEUiXQ=='))));
+const KEY='wordlechad_v1',ALL=/^[A-Z]{5}$/;
+const fold=s=>s.normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[œŒ]/g,'OE').toUpperCase();
+const today=DAY();
+const answerDisp=WORDS[((today.n%WORDS.length)+WORDS.length)%WORDS.length],answer=fold(answerDisp);
+let st=null;try{st=JSON.parse(ls(KEY))}catch{}
+if(!st||st.day!==today.id)st={day:today.id,g:[],status:'play',sent:0};
+const save=()=>ls(KEY,JSON.stringify(st));
+let cur='',busy=false;
+const gridEl=$('grid');
+const tiles=[];for(let r=0;r<6;r++){const row=document.createElement('div');row.className='r';tiles.push([]);for(let c=0;c<5;c++){const t=document.createElement('div');t.className='t';t.style.setProperty('--i',c);row.append(t);tiles[r].push(t)}gridEl.append(row)}
+function rate(g){const res=Array(5).fill(0),left={};for(let i=0;i<5;i++){if(g[i]===answer[i])res[i]=2;else left[answer[i]]=(left[answer[i]]||0)+1}
+  for(let i=0;i<5;i++)if(res[i]!==2&&left[g[i]]>0){res[i]=1;left[g[i]]--}return res}
+const keyState={};
+function applyKeys(){for(const g of st.g){const r=rate(g);for(let i=0;i<5;i++)keyState[g[i]]=Math.max(keyState[g[i]]??-1,r[i])}
+  document.querySelectorAll('.k[data-k]').forEach(k=>{const v=keyState[k.dataset.k];k.className='k'+(k.dataset.w?' w':'')+(v===undefined?'':' s'+v)})}
+function paintRow(r,g,anim){const res=rate(g);for(let c=0;c<5;c++){const t=tiles[r][c];t.textContent=g[c];t.className='t rev s'+res[c];if(!anim){t.style.animation='none';t.style.background='var(--c)'}}}
+function paintCur(){const r=st.g.length;if(r>5)return;for(let c=0;c<5;c++){const t=tiles[r][c];t.textContent=cur[c]||'';t.className='t'+(cur[c]?' f':'')}}
+// clavier à l'écran (AZERTY)
+const LAY=['AZERTYUIOP','QSDFGHJKLM','ENTER|WXCVBN|DEL'];
+LAY.forEach(l=>{const row=document.createElement('div');row.className='kr';l.split(l.includes('|')?'|':'').forEach(p=>{
+  if(l.includes('|')&&p.length>1&&p!=='WXCVBN'){const b=document.createElement('button');b.className='k w';b.dataset.w=1;b.textContent=p==='ENTER'?'↵':'⌫';b.onclick=()=>press(p==='ENTER'?'Enter':'Backspace');row.append(b)}
+  else for(const ch of p){const b=document.createElement('button');b.className='k';b.dataset.k=ch;b.textContent=ch;b.onclick=()=>press(ch);row.append(b)}});$('kb').append(row)});
+function press(k){if(busy||st.status!=='play')return;
+  if(k==='Enter'){if(cur.length<5){shake();toast('Pas assez de lettres');return}submit();return}
+  if(k==='Backspace'){cur=cur.slice(0,-1);paintCur();return}
+  const L=fold(k);if(L.length===1&&/[A-Z]/.test(L)&&cur.length<5){cur+=L;paintCur()}}
+addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey)return;if($('veil').classList.contains('hide')===false&&e.key!=='Escape')return;
+  if(e.key==='Enter'||e.key==='Backspace'){e.preventDefault();press(e.key)}else if(e.key.length===1)press(e.key)});
+function shake(){const r=tiles[st.g.length][0].parentNode;r.classList.remove('shake');void r.offsetWidth;r.classList.add('shake')}
+function submit(){
+  const g=cur;// tout mot de 5 lettres est accepté
+  const r=st.g.length;st.g.push(g);cur='';
+  const won=g===answer;if(won)st.status='won';else if(st.g.length>=6)st.status='lost';
+  save();busy=true;paintRow(r,g,true);
+  setTimeout(()=>{applyKeys();busy=false;
+    if(won){for(let c=0;c<5;c++)tiles[r][c].classList.add('win');toast(['Génial !','Magnifique !','Impressionnant !','Splendide !','Bien joué !','Ouf, de justesse !'][r],1800)}
+    if(st.status!=='play')setTimeout(endPanel,won?1100:500);else paintCur()},5*280+350);
+}
+function shareText(){const rows=st.g.map(g=>rate(g).map(v=>['⬛','🟨','🟩'][v]).join('')).join('\n');return `Mot du jour #${today.n-20000} ${st.status==='won'?st.g.length:'X'}/6\n${rows}`}
+function endPanel(){
+  const won=st.status==='won',p=$('panel');p.replaceChildren();
+  const add=(tag,txt,cls)=>{const e=document.createElement(tag);if(cls)e.className=cls;e.textContent=txt;p.append(e);return e};
+  add('div',won?'🎉':'😵','big');add('h2',won?'Trouvé en '+st.g.length+' essai'+(st.g.length>1?'s':'')+' !':'Raté…');
+  if(!won){add('div','Le mot était',  'muted');add('div',answerDisp,'word')}
+  const pt=add('div',won?(HUB?(st.sent?'⭐ +1 point au classement':'⏳ Envoi du point…'):'⭐ Réussi !'):'Pas de point aujourd’hui','pt');if(!won)pt.style.background='#5d5b80';pt.id='pt';
+  add('div','Prochain mot dans '+fmtLeft(DAY().left)+' (tous les jours à 3 h)','muted');
+  const lb=document.createElement('div');lb.className='lb';p.append(lb);drawBoard(lb);
+  const b=document.createElement('div');b.className='btns';
+  const sh=document.createElement('button');sh.className='btn primary';sh.textContent='📋 Copier le résultat';sh.onclick=()=>{const t=shareText();(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>toast('Résultat copié !'),()=>{prompt('Copie ton résultat :',t)})};
+  const cl=document.createElement('button');cl.className='btn';cl.textContent='Fermer';cl.onclick=()=>$('veil').classList.add('hide');
+  b.append(sh,cl);p.append(b);$('veil').classList.remove('hide');
+  if(won)sendWin(st,KEY,()=>{const e=$('pt');if(e)e.textContent='⭐ +1 point au classement';drawBoard(lb)});
+}
+function rulesPanel(){const p=$('panel');p.innerHTML='<h2>Comment jouer ?</h2><div class="rules">Trouve le <b>mot français de 5 lettres</b> en 6 essais.<br>Après chaque essai, les cases changent de couleur :<div class="ex"><i style="background:#16b87f">M</i><i>O</i><i>T</i><i>S</i><i>!</i></div>🟩 bien placée · 🟨 dans le mot, mal placée · ⬛ absente.<br><br>📅 <b>Un nouveau mot chaque jour à 3 h du matin.</b><br>⭐ Trouver le mot rapporte <b>1 point</b> au classement du hub, 1 point maximum par jour.<br>Les accents ne comptent pas.</div><div class="btns"><button class="btn primary" id="cl">C’est parti !</button></div>';
+  $('veil').classList.remove('hide');$('cl').onclick=()=>{$('veil').classList.add('hide');ls(KEY+'_rules','1')}}
+$('bRules').onclick=rulesPanel;
+function tick(){$('info').textContent='n°'+(today.n-20000)+' · prochain mot dans '+fmtLeft(DAY().left)}
+tick();setInterval(tick,30000);
+// reprise de la partie du jour
+st.g.forEach((g,i)=>paintRow(i,g,false));applyKeys();paintCur();
+if(st.status!=='play')setTimeout(endPanel,300);else if(!ls(KEY+'_rules'))rulesPanel();
+</script>
+</body>
+</html>
