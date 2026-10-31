@@ -136,7 +136,7 @@ function submit(){
   const g=cur;
   if(!DICT.has(g)){shake();sfx.bad();toast('Ce mot n’existe pas dans le dictionnaire',1800);return}
   const r=st.g.length;st.g.push(g);cur='';
-  const won=g===answer;if(won){st.status='won';if(!hist.includes(st.day)){hist.push(st.day);ls(HK,JSON.stringify(hist))}}else if(st.g.length>=6)st.status='lost';
+  const won=g===answer;if(won)st.status='won';else if(st.g.length>=6)st.status='lost';if(st.status!=='play')markDay(st.day,st.status==='won');
   save();busy=true;paintRow(r,g,true);
   rate(g).forEach((v,i)=>setTimeout(()=>sfx.tile(v),i*280+300));
   setTimeout(()=>{applyKeys();busy=false;
@@ -146,15 +146,21 @@ function submit(){
 }
 function shareText(){const rows=st.g.map(g=>rate(g).map(v=>['⬛','🟨','🟩'][v]).join('')).join('\n');return `Mot du jour #${today.n-20000} ${st.status==='won'?st.g.length:'X'}/6\n${rows}`}
 /* série : jours de suite réussis (celle du hub si on l'a, sinon calculée sur cet appareil) */
-const HK=KEY+'_hist';let hist=[];try{hist=JSON.parse(ls(HK))||[]}catch{}
-if(st.status==='won'&&!hist.includes(st.day)){hist.push(st.day);ls(HK,JSON.stringify(hist))}
-function localStreak(){const set=new Set(hist.map(d=>Math.floor(Date.parse(d)/864e5)).filter(Number.isFinite));if(!set.size)return{current:0,best:0};
+const HK=KEY+'_hist',PK=KEY+'_played';let hist=[],phist=[];try{hist=JSON.parse(ls(HK))||[]}catch{}try{phist=JSON.parse(ls(PK))||[]}catch{}
+function markDay(day,won){if(won&&!hist.includes(day)){hist.push(day);ls(HK,JSON.stringify(hist))}if(!phist.includes(day)){phist.push(day);ls(PK,JSON.stringify(phist))}}
+if(st.status!=='play')markDay(st.day,st.status==='won');
+function runOf(days){const set=new Set(days.map(d=>Math.floor(Date.parse(d)/864e5)).filter(Number.isFinite));if(!set.size)return{current:0,best:0};
   const a=[...set].sort((x,y)=>x-y);let best=1,run=1;for(let i=1;i<a.length;i++){run=a[i]===a[i-1]+1?run+1:1;if(run>best)best=run}
   let cur=0;const last=a[a.length-1];if(last>=today.n-1){let d=last;while(set.has(d)){cur++;d--}}return{current:cur,best}}
+function localStreak(){const p=runOf(hist.concat(phist)),w=runOf(hist);return{current:p.current,best:p.best,wins:w.current,winsBest:w.best}}
 let hubStreak=null,hubDay=null;
-const streakNow=()=>{const l=localStreak();return hubStreak?{current:Math.max(hubStreak.current,l.current),best:Math.max(hubStreak.best,l.best)}:l};
-function drawStreak(){const s=streakNow(),e=$('streak');e.classList.toggle('hide',!s.current);e.textContent='🔥 '+s.current;e.title='Série : '+s.current+' jour'+(s.current>1?'s':'')+' de suite'}
-function streakLine(){const s=streakNow();return s.current?'🔥 Série : '+s.current+' jour'+(s.current>1?'s':'')+' de suite'+(s.best>s.current?' · record '+s.best:' · c’est ton record !'):'🔥 Série : 0 — reviens demain !'}
+const streakNow=()=>{const l=localStreak(),h=hubStreak;if(!h)return l;const m=k=>Math.max(h[k]||0,l[k]||0);return{current:m('current'),best:m('best'),wins:m('wins'),winsBest:m('winsBest')}};
+const jr=n=>n+' jour'+(n>1?'s':''),vic=n=>n+' victoire'+(n>1?'s':'')+' d’affilée';
+function drawStreak(){const s=streakNow(),e=$('streak');e.classList.toggle('hide',!s.current);e.textContent='🔥 '+s.current+(s.wins?' · 🏆 '+s.wins:'');e.title='Série : '+jr(s.current)+' de suite (même en cas de défaite) · '+vic(s.wins)}
+function streakLine(){const s=streakNow();
+  const a=s.current?'🔥 Série : '+jr(s.current)+' de suite'+(s.best>s.current?' · record '+s.best:' · c’est ton record !'):'🔥 Série : 0 — reviens demain !';
+  const b='🏆 '+(s.wins?vic(s.wins)+(s.winsBest>s.wins?' · record '+s.winsBest:' · c’est ton record !'):'Victoires d’affilée : 0');
+  return a+'\n'+b}
 /* hub : point du jour + grille du jour (pour que les autres la voient) + série */
 function syncHub(after){
   if(!HUB){after&&after();return}
@@ -169,7 +175,7 @@ function endPanel(){
   add('div',won?'🎉':'😵','big');add('h2',won?'Trouvé en '+st.g.length+' essai'+(st.g.length>1?'s':'')+' !':'Raté…');
   if(!won){add('div','Le mot était','muted');add('div',answerDisp,'word')}
   const pt=add('div',won?(HUB?(st.sent?'⭐ +1 point au classement':'⏳ Envoi du point…'):'⭐ Réussi !'):'Pas de point aujourd’hui','pt');if(!won)pt.style.background='#5d5b80';pt.id='pt';
-  const sl=add('div',streakLine(),'muted');sl.style.cssText='color:#e8590c;font-size:16px;margin:2px 0 6px';sl.id='sl';
+  const sl=add('div',streakLine(),'muted');sl.style.cssText='color:#e8590c;font-size:16px;margin:2px 0 6px;white-space:pre-line;line-height:1.5';sl.id='sl';
   add('div','Prochain mot dans '+fmtLeft(DAY().left)+' (tous les jours à 3 h)','muted');
   const lb=document.createElement('div');lb.className='lb';p.append(lb);drawBoard(lb);
   const b=document.createElement('div');b.className='btns';
